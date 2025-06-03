@@ -10,10 +10,9 @@
                <h1>Sistema de Gestión Odontológica</h1>
          </div>
          <ul id="menu">
-               <li><a href="index.php">inicio</a> </li>
-               <li><a href="index.php?accion=asignar">Asignar</a> </li>
-            <li><a href="index.php?accion=consultar">Consultar Cita</a> </li>
-               <li><a href="index.php?accion=cancelar">Cancelar Cita</a> </li>
+               <li><a href="index.php">Inicio</a> </li>
+               <li><a href="index.php?accion=login">Iniciar Sesion</a> </li>
+               <li><a href="index.php?accion=register">Crear Cuenta</a> </li>
          </ul>
          <div id="contenido">
             <h2>Información General</h2>
