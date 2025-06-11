@@ -118,8 +118,8 @@ $rol = $_SESSION['rol'];
          <form id="agregarPaciente">
             <table>
                <tr>
-                  <td>Documento</td>
-                  <td><input type="text" name="PacDocumento" id="PacDocumento"></td>
+                  <td>Identificacion</td>
+                  <td><input type="text" name="PacIdentificacion" id="PacIdentificacion"></td>
                </tr>
                <tr>
                   <td>Nombres</td>
@@ -136,12 +136,16 @@ $rol = $_SESSION['rol'];
                <tr>
                   <td>Sexo</td>
                   <td>
-                  <select id="pacSexo" name="PacSexo">
-                     <option value="-1" selected="selected">--Selecione el sexo ---</option>
-                     <option value="M">Masculino</option>
-                     <option value="F">Femenino</option>
-                  </select>
+                     <select id="PacSexo" name="PacSexo">
+                        <option value="-1" selected="selected">--Selecione el sexo ---</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                     </select>
                   </td>
+               </tr>
+               <tr>
+                  <td>Correo</td>
+                  <td><input type="text" name="pacCorreo" id="pacCorreo"></td>
                </tr>
             </table>
          </form>

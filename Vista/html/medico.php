@@ -18,11 +18,11 @@ $rol = $_SESSION['rol'];
       <script src="Vista/jquery/jquery-3.7.1.js"></script>
       <script>
          var rolUsuario = <?php echo json_encode($rol); ?>;
-      </script> 
+      </script>
       <script src="Vista/js/menu.js"></script>
       <script src="Vista/jquery/jquery-ui-1.14.1.custom/jquery-ui.js" type="text/javascript"></script>
       <link href="Vista/jquery/jquery-ui-1.14.1.custom/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
-      <script src="Vista/js/script.js" type="text/javascript"></script>
+      <script src="Vista/js/admin.js"></script>
    </head>
    <body>
       <div id="contenedor">
@@ -32,7 +32,7 @@ $rol = $_SESSION['rol'];
          <ul id="menu"></ul>
          <div id="contenido">
             <h2>Gestion de medicos</h2>
-            <input type="button" name="ingMedico" id="ingMedico" value="IngresarMedico" onclick="medicoFormulario()">
+            <input type="button" name="ingMedico" id="ingMedico" value="Ingresar Medico" onclick="medicoFormulario()">
             <br> <br>
             <table border="1" cellpadding="5">
                <tr>
@@ -49,42 +49,37 @@ $rol = $_SESSION['rol'];
                   <td><?php echo $medico->MedNombres; ?></td>
                   <td><?php echo $medico->MedApellidos; ?></td>
                   <td><?php echo $medico->medCorreo; ?></td>
-                  <td></td>
-                  <td></td>
+                  <td><a href='index.php?accion=editarMedico&identificacion=<?php echo $medico->MedIdentificacion; ?>'>Editar</a></td>
+                  <td><a href="#" onclick="confirmarCancelarMedico('<?php echo $medico->MedIdentificacion; ?>')">Eliminar</a></td>
                </tr>
             <?php } ?>
             </table>
          </div>
       </div>
 
+      <!-- Modal para ingresar medico -->
       <div id="frmMedico" title="Agregar Nuevo Medico">
-         <form id="agregarPaciente">
+         <form id="agregarMedico">
             <table>
                <tr>
-                  <td>Documento</td>
-                  <td><input type="text" name="MedIdentificacion" id="PacDocumento"></td>
+                  <td>Identificacion</td>
+                  <td><input type="text" name="MedIdentificacion" id="MedIdentificacion"></td>
                </tr>
                <tr>
                   <td>Nombres</td>
-                  <td><input type="text" name="PacNombres" id="PacNombres"></td>
+                  <td><input type="text" name="MedNombres" id="MedNombres"></td>
                </tr>
                <tr>
                   <td>Apellidos</td>
-                  <td><input type="text" name="PacApellidos" id="PacApellidos"></td>
+                  <td><input type="text" name="MedApellidos" id="MedApellidos"></td>
                </tr>
                <tr>
-                  <td>Fecha de Nacimiento</td>
-                  <td><input type="date" name="PacNacimiento" id="PacNacimiento"></td>
+                  <td>Correo</td>
+                  <td><input type="text" name="medCorreo" id="MedCorreo"></td>
                </tr>
                <tr>
-                  <td>Sexo</td>
-                  <td>
-                  <select id="pacSexo" name="PacSexo">
-                     <option value="-1" selected="selected">--Selecione el sexo ---</option>
-                     <option value="M">Masculino</option>
-                     <option value="F">Femenino</option>
-                  </select>
-                  </td>
+                  <td>Contraseña</td>
+                  <td><input type="password" name="medPassword" id="MedPassword"></td>
                </tr>
             </table>
          </form>

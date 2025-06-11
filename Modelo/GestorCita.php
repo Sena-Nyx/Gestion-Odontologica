@@ -1,5 +1,7 @@
 <?php
 class GestorCita {
+
+    /* Citas */
     public function agregarCita(Cita $cita){
         $conexion = new Conexion();
         $conexion->abrir();
@@ -46,33 +48,6 @@ class GestorCita {
 
         return $result ;
     }
-    
-    public function consultarPaciente($doc){
-        $conexion = new Conexion();
-        $conexion->abrir();
-        $sql = "SELECT * FROM Pacientes WHERE PacIdentificacion = '$doc' ";
-        $conexion->consulta($sql);
-        $result = $conexion->obtenerResult();
-        $conexion->cerrar();
-
-        return $result ;
-    }
-    
-    public function agregarPaciente(Paciente $paciente){
-        $conexion = new Conexion();
-        $conexion->abrir();
-        $identificacion = $paciente->obtenerIdentificacion();
-        $nombres = $paciente->obtenerNombres();
-        $apellidos = $paciente->obtenerApellidos();
-        $fechaNacimiento = $paciente->obtenerFechaNacimiento();
-        $sexo = $paciente->obtenerSexo();
-        $sql = "INSERT INTO Pacientes VALUES ('$identificacion','$nombres','$apellidos',". "'$fechaNacimiento','$sexo')";
-        $conexion->consulta($sql);
-        $filasAfectadas = $conexion->obtenerFilasAfectadas();
-        $conexion->cerrar();
-
-        return $filasAfectadas;
-    }
 
     public function consultarHorasDisponibles($medico,$fecha){
         $conexion = new Conexion();
@@ -110,6 +85,7 @@ class GestorCita {
         return $filasAfectadas;
     }
 
+    /* Login */
     public function consultarRol(){
         $conexion = new Conexion();
         $conexion->abrir();
@@ -151,6 +127,48 @@ class GestorCita {
         return $result;
     }
 
+    /* Pacientes  */
+    public function consultarPacientes(){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT * FROM pacientes ";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        
+        return $result ;
+    }
+
+    public function consultarPacientePorId($doc){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT * FROM pacientes WHERE PacIdentificacion = '$doc' ";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+
+        return $result ;
+    }
+
+    public function agregarPaciente(Paciente $paciente){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $identificacion = $paciente->obtenerIdentificacion();
+        $nombres = $paciente->obtenerNombres();
+        $apellidos = $paciente->obtenerApellidos();
+        $fechaNacimiento = $paciente->obtenerFechaNacimiento();
+        $sexo = $paciente->obtenerSexo();
+        $correo = $paciente->obtenerCorreo();
+
+        $sql = "INSERT INTO pacientes (PacIdentificacion, PacNombres, PacApellidos, PacFechaNacimiento, PacSexo, id_rol, pacCorreo) 
+                VALUES ('$identificacion','$nombres','$apellidos','$fechaNacimiento','$sexo', 2, '$correo')";
+        $conexion->consulta($sql);
+        $filasAfectadas = $conexion->obtenerFilasAfectadas();
+        $conexion->cerrar();
+
+        return $filasAfectadas;
+    }
+
     public function registrarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo, $password) {
         $conexion = new Conexion();
         $conexion->abrir();
@@ -161,7 +179,28 @@ class GestorCita {
         $conexion->cerrar();
         return $filas > 0;
     }
+
+    public function editarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $set = "PacNombres='$nombres', PacApellidos='$apellidos', PacFechaNacimiento='$fechaNacimiento', PacSexo='$sexo', pacCorreo='$correo'";
+        $sql = "UPDATE pacientes SET $set WHERE PacIdentificacion='$identificacion'";
+        $conexion->consulta($sql);
+        $conexion->cerrar();
+    }
+
+    public function eliminarPaciente($identificacion) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "DELETE FROM pacientes WHERE PacIdentificacion='$identificacion'";
+        $conexion->consulta($sql);
+        $filasAfectadas = $conexion->obtenerFilasAfectadas();
+        $conexion->cerrar();
+
+        return $filasAfectadas;
+    }
     
+    /* Medicos */
     public function verMedicos() {
         $gestor = new GestorCita();
         $medicos = $gestor->consultarMedicos();
@@ -179,25 +218,112 @@ class GestorCita {
         return $result ;
     }
 
-    public function registrarMedico($identificacion, $nombres, $apellidos, $especialidad, $correo, $password) {
+    public function consultarMedicoPorId($identificacion) {
         $conexion = new Conexion();
         $conexion->abrir();
-        $sql = "INSERT INTO medicos (MedIdentificacion, MedNombres, MedApellidos, MedEspecialidad, MedCorreo, MedPassword, id_rol) 
-                VALUES ('$identificacion', '$nombres', '$apellidos', '$especialidad', '$correo', '$password', 3)";
+        $sql = "SELECT * FROM medicos WHERE MedIdentificacion = '$identificacion'";
         $conexion->consulta($sql);
-        $filas = $conexion->obtenerFilasAfectadas();
+        $result = $conexion->obtenerResult();
         $conexion->cerrar();
-        return $filas > 0;
+        return $result->fetch_object();
     }
 
-    public function editarMedico($identificacion, $nombres, $apellidos, $password) {
+    public function agregarMedico($identificacion, $nombres, $apellidos, $correo, $password){
         $conexion = new Conexion();
         $conexion->abrir();
-        $sql = "UPDATE medicos SET MedNombres='$nombres', MedApellidos='$apellidos', MedPassword='$password' WHERE MedIdentificacion='$identificacion'";
+        $sqlCheck = "SELECT * FROM medicos WHERE MedIdentificacion = '$identificacion' OR medCorreo = '$correo'";
+        $conexion->consulta($sqlCheck);
+        if ($conexion->obtenerResult()->num_rows > 0) {
+            $conexion->cerrar();
+            return "existe";
+        }
+        $sql = "INSERT INTO medicos (MedIdentificacion, MedNombres, MedApellidos, id_rol, medCorreo, medPassword) 
+                VALUES ('$identificacion','$nombres','$apellidos', 3, '$correo', '$password')";
         $conexion->consulta($sql);
-        $result = $conexion->obtenerFilasAfectadas();
+        $filasAfectadas = $conexion->obtenerFilasAfectadas();
         $conexion->cerrar();
-        return $result > 0;
+
+        if ($filasAfectadas > 0) {
+            return "exito";
+        } else {
+            return "error";
+        }
     }
 
+    public function editarMedico($identificacion, $nombre, $apellido, $correo) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $set = "MedNombres='$nombre', MedApellidos='$apellido', medCorreo='$correo'";
+        $sql = "UPDATE medicos SET $set WHERE MedIdentificacion='$identificacion'";
+        $conexion->consulta($sql);
+        $conexion->cerrar();
+    }
+
+    public function eliminarMedico($identificacion) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "DELETE FROM medicos WHERE MedIdentificacion='$identificacion'";
+        $conexion->consulta($sql);
+        $filasAfectadas = $conexion->obtenerFilasAfectadas();
+        $conexion->cerrar();
+
+        return $filasAfectadas;
+    }
+
+    public function consultarPacientesPorMedico($medicoCorreo) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT DISTINCT p.* FROM pacientes p
+                INNER JOIN citas c ON c.CitPaciente = p.PacIdentificacion
+                INNER JOIN medicos m ON c.CitMedico = m.MedIdentificacion
+                WHERE m.medCorreo = '$medicoCorreo'";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result;
+    }
+
+    public function consultarCitasPorMedico($medicoCorreo) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT c.* FROM citas c
+                INNER JOIN medicos m ON c.CitMedico = m.MedIdentificacion
+                WHERE m.medCorreo = '$medicoCorreo'";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result;
+    }
+
+    /* Tratamientos */
+    public function agregarTratamiento($fechaAsignado, $descripcion, $fechaInicio, $fechaFin, $observaciones, $paciente) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "INSERT INTO tratamientos (TraFechaAsignado, TraDescripcion, TraFechaInicio, TraFechaFin, TraObservaciones, TraPaciente)
+                VALUES ('$fechaAsignado', '$descripcion', '$fechaInicio', '$fechaFin', '$observaciones', '$paciente')";
+        $conexion->consulta($sql);
+        $filasAfectadas = $conexion->obtenerFilasAfectadas();
+        $conexion->cerrar();
+        return $filasAfectadas > 0;
+    }
+
+    public function consultarPacientePorCorreo($correo){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT * FROM pacientes WHERE pacCorreo = '$correo'";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result->fetch_object();
+    }
+
+    public function consultarTratamientosPorPaciente($doc){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT * FROM tratamientos WHERE TraPaciente = '$doc'";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result;
+    }
 }

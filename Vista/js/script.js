@@ -73,8 +73,3 @@ function confirmarCancelar(numero){
     $("cancelarConsultar").trigger("click");
 }
 
-function medicoFormulario(){
-    documento = "" + $("#asignarDocumento").val();
-    $("#MedIdentificacion").attr("value",documento);
-    $("#frmMedico").dialog('open');
-}

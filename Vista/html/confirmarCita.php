@@ -75,6 +75,10 @@
                   <td><?php echo $fila->CitObservaciones;?></td>
                </tr>
             </table>
+            <br> 
+            <a href="Vista/html/descargarCitaPdf.php?numero=<?php echo $fila->CitNumero; ?>" target="_blank">
+               <button>Descargar PDF</button>
+            </a>  
          </div>
       </div>
    </body>

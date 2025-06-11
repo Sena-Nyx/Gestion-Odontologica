@@ -5,13 +5,15 @@ class Paciente {
     private $apellidos;
     private $fechaNacimiento;
     private $sexo;
+    private $correo;
 
-    public function __construct($ide,$nom,$ape,$fNa,$sex) {
+    public function __construct($ide,$nom,$ape,$fNa,$sex,$cor) {
         $this->identificacion = $ide;
         $this->nombres = $nom;
         $this->apellidos = $ape;
         $this->fechaNacimiento = $fNa;
         $this->sexo = $sex;
+        $this->correo = $cor;
     }
 
     public function obtenerIdentificacion(){
@@ -29,5 +31,8 @@ class Paciente {
     }
     public function obtenerSexo(){
         return $this->sexo;
+    }
+    public function obtenerCorreo(){
+        return $this->correo;
     }
 }

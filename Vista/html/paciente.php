@@ -22,9 +22,8 @@ $rol = $_SESSION['rol'];
       <script src="Vista/js/menu.js"></script>
       <script src="Vista/jquery/jquery-ui-1.14.1.custom/jquery-ui.js" type="text/javascript"></script>
       <link href="Vista/jquery/jquery-ui-1.14.1.custom/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
-      <script src="Vista/js/script.js" type="text/javascript"></script>
+      <script src="Vista/js/admin.js"></script>
    </head>
-
    <body>
       <div id="contenedor">
          <div id="encabezado">
@@ -33,37 +32,71 @@ $rol = $_SESSION['rol'];
          <ul id="menu"></ul>
          <div id="contenido">
             <h2>Gestion de pacientes</h2>
-            <p>Contenido de la página</p>
-               <table border="1" cellpadding="5">
-                  <tr>
-                     <th>MedIdentificacion</th>
-                     <th>MedNombres</th>
-                     <th>MedApellidos</th>
-                     <th>Editar Medico</th>
-                     <th>Eliminar Medico</th>
-                  </tr>
-
-                  <?php
-                     $conexion = mysqli_connect('localhost', 'root', '', 'tareas') or die("Problemas con la conexión");
-
-                     $registros = mysqli_query($conexion, "SELECT * FROM tareas WHERE usuario_id = '$_SESSION[usuario_id]'") 
-                     or die("Problemas en el select: " . mysqli_error($conexion));
-
-
-                     while ($reg = mysqli_fetch_array($registros)) 
-                     {
-                        echo "<tr>";
-                        echo "<td>" . $reg['titulo'] . "</td>";
-                        echo "<td>" . $reg['descripcion'] . "</td>";
-                        echo "<td>" . $reg['fecha_creacion'] . "</td>";
-                        echo "<td><a href='editar_tarea.php?id=" . $reg['id'] . "'>Editar</a></td>";
-                        echo "<td><a href='eliminar_tarea.php?id=" . $reg['id'] ."'>Eliminar</a></td>";
-                        echo "</tr>";
-                     }
-                     mysqli_close($conexion);
-                  ?>
-               </table>
+            <input type="button" name="ingPaciente" id="ingpaciente" value="Ingresar Paciente" onclick="pacienteFormulario()">
+            <br> <br>
+            <table border="1" cellpadding="2">
+               <tr>
+                  <th>Identificación</th>
+                  <th>Nombres</th>
+                  <th>Apellidos</th>
+                  <th>Fecha Nacimiento</th>
+                  <th>Sexo</th>
+                  <th>Correo</th>
+                  <th>Editar</th>
+                  <th>Eliminar</th>
+               </tr>
+               <?php while($paciente = $pacientes->fetch_object()) { ?>
+               <tr>
+                  <td><?php echo $paciente->PacIdentificacion; ?></td>
+                  <td><?php echo $paciente->PacNombres; ?></td>
+                  <td><?php echo $paciente->PacApellidos; ?></td>
+                  <td><?php echo $paciente->PacFechaNacimiento; ?></td>
+                  <td><?php echo $paciente->PacSexo; ?></td>
+                  <td><?php echo $paciente->pacCorreo; ?></td>
+                  <td><a href='index.php?accion=editarPaciente&identificacion=<?php echo $paciente->PacIdentificacion; ?>'>Editar</a></td>
+                  <td><a href="#" onclick="confirmarCancelarPaciente('<?php echo $paciente->PacIdentificacion; ?>')">Eliminar</a></td>
+               </tr>
+            <?php } ?>
+            </table>
          </div>
+      </div>
+
+      <!-- Modal para ingresar Paciente -->
+      <div id="frmPaciente" title="Agregar Nuevo Paciente">
+         <form id="agregarPaciente">
+            <table>
+               <tr>
+                  <td>Identificacion</td>
+                  <td><input type="text" name="PacIdentificacion" id="PacIdentificacion"></td>
+               </tr>
+               <tr>
+                  <td>Nombres</td>
+                  <td><input type="text" name="PacNombres" id="PacNombres"></td>
+               </tr>
+               <tr>
+                  <td>Apellidos</td>
+                  <td><input type="text" name="PacApellidos" id="PacApellidos"></td>
+               </tr>
+               <tr>
+                  <td>Fecha de Nacimiento</td>
+                  <td><input type="date" name="PacNacimiento" id="PacNacimiento"></td>
+               </tr>
+               <tr>
+                  <td>Sexo</td>
+                  <td>
+                     <select id="PacSexo" name="PacSexo">
+                        <option value="-1" selected="selected">--Selecione el sexo ---</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                     </select>
+                  </td>
+               </tr>
+               <tr>
+                  <td>Correo</td>
+                  <td><input type="text" name="pacCorreo" id="pacCorreo"></td>
+               </tr>
+            </table>
+         </form>
       </div>
    </body>
 </html>
