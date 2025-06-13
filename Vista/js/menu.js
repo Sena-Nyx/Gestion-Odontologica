@@ -17,4 +17,4 @@ $(document).ready(function() {
         menu.append('<li><a href="index.php?accion=verCitasMed">Mis Citas</a></li>');
         menu.append('<li><a href="index.php?accion=tratamientos">Tratamientos</a></li>');
     } 
-});
+});no 

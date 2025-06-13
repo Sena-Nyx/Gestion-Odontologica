@@ -30,27 +30,37 @@ $rol = $_SESSION['rol'];
                <h1>Sistema de Gestión Odontológica</h1>
          </div>
          <ul id="menu"></ul>
-         <div id="contenido">
-            <h2>Gestion de medicos</h2>
+         <div id="contenido" style="position: relative;">
+            <?php if (isset($_SESSION['nombre'])): ?>
+               <div style="position: absolute; top: 5px; right: 10px; font-weight: bold; color: #0075ff;">
+                  <?php echo htmlspecialchars($_SESSION['nombre']); ?>
+                  <a href="index.php?accion=logout" style="font-weight:normal; color:#ff3333; font-size:0.95em;">Cerrar sesion</a>
+               </div>
+            <?php endif; ?>
+            <h2>Gestion de tratamientos</h2>
             <a href="index.php?accion=asignarTratamientos">
                <button>Asignar Tratamiento</button>
             </a>
             <br> <br>
             <table border="1" cellpading="5">
                <tr>
-                  <th>Identificación</th>
-                  <th>Nombres</th>
-                  <th>Apellidos</th>
-                  <th>Fecha Nacimiento</th>
-                  <th>Sexo</th>
+                  <th>Numero</th>
+                  <th>Descripcion</th>
+                  <th>Fecha Inicio</th>
+                  <th>Fecha Fin</th>
+                  <th>Paciente</th>
+                  <th>Editar</th>
+                  <th>Eliminar</th>
                </tr>
-               <?php while($paciente = $pacientes->fetch_object()) { ?>
+               <?php while($trat = $tratamientos->fetch_object()) { ?>
                <tr>
-                  <td><?php echo $paciente->PacIdentificacion; ?></td>
-                  <td><?php echo $paciente->PacNombres; ?></td>
-                  <td><?php echo $paciente->PacApellidos; ?></td>
-                  <td><?php echo $paciente->PacFechaNacimiento; ?> </td>
-                  <td><?php echo $paciente->PacSexo; ?> </td>
+                  <td><?php echo $trat->TraNumero; ?></td>
+                  <td><?php echo $trat->TraDescripcion; ?></td>
+                  <td><?php echo $trat->TraFechaInicio; ?></td>
+                  <td><?php echo $trat->TraFechaFin; ?> </td>
+                  <td><?php echo $trat->TraPaciente; ?> </td>
+                  <td><a href="index.php?accion=editarTratamiento&numero=<?php echo $trat->TraNumero; ?>">Editar</a></td>
+                  <td><a href="index.php?accion=eliminarTratamiento&numero=<?php echo $trat->TraNumero; ?>" onclick="return confirm('¿Seguro que deseas eliminar este tratamiento?');">Eliminar</a></td>
                </tr>
                <?php } ?>
             </table>

@@ -1,4 +1,13 @@
 <?php
+require_once __DIR__ . '/../Vista/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../Vista/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../Vista/PHPMailer/src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+?>
+
+<?php
 class Controlador {
     public function verPagina($ruta){
         require_once $ruta;
@@ -9,7 +18,6 @@ class Controlador {
         $gestorCita     = new GestorCita();
         $result         = $gestorCita->consultarCitaPorId($cita);
         require_once 'Vista/html/confirmarCita.php';
-        
     }
 
     public function confirmarCancelarCita($cita){
@@ -79,23 +87,59 @@ class Controlador {
         $usuario = $result->fetch_object();
 
         if ($usuario) {
+            
+            // Guardar el correo original del login para el envío
+            $correoLogin = $correo;
+
+            // Asignar variables de sesión según el rol
             if ($rol == 1) { // Administrador
                 $_SESSION['correo'] = $usuario->admCorreo; 
                 $_SESSION['password'] = $usuario->admPassword;
-                $_SESSION['rol'] = $usuario->id_rol; 
+                $_SESSION['rol'] = $usuario->id_rol;
+                $_SESSION['nombre'] = $usuario->admNombre;
+                $_SESSION['identificacion'] = $usuario->admIdentificacion;
             }
-
             elseif ($rol == 2) { // Paciente
                 $_SESSION['correo'] = $usuario->pacCorreo; 
                 $_SESSION['password'] = $usuario->pacPassword;
                 $_SESSION['rol'] = $usuario->id_rol; 
+                $_SESSION['nombre'] = $usuario->PacNombres;
+                $_SESSION['identificacion'] = $usuario->PacIdentificacion;
             }
-
             elseif ($rol == 3) { // Médico
                 $_SESSION['correo'] = $usuario->medCorreo; 
                 $_SESSION['password'] = $usuario->medPassword;
-                $_SESSION['rol'] = $usuario->id_rol; 
+                $_SESSION['rol'] = $usuario->id_rol;
+                $_SESSION['nombre'] = $usuario->MedNombres;
+                $_SESSION['identificacion'] = $usuario->MedIdentificacion;
             }
+
+            // --- ENVÍO DE CORREO CON PHPMailer ---
+            $mail = new PHPMailer(true);
+            try {
+                $mail->SMTPDebug = 2; 
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'TUCORREO@gmail.com';
+                $mail->Password   = 'CONTRASEÑA_DE_APP';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail->Port       = 465;
+                $mail->setFrom('TUCORREO@gmail.com', 'Sistema Odontológico');
+                $mail->addAddress($correoLogin);
+                $mail->isHTML(true);
+                $mail->Subject = 'Inicio de sesión exitoso';
+                $mail->Body    = 'Hola, has iniciado sesión correctamente.';
+
+                $mail->send();
+                echo 'Correo enviado exitosamente';
+            } catch (Exception $e) {
+                echo "Error al enviar: {$mail->ErrorInfo}";
+                error_log("PHPMailer error: {$mail->ErrorInfo}");
+            }
+
+            // --- FIN ENVÍO DE CORREO ---
+
             header("Location: index.php?accion=principal");
             exit;
         } else {
@@ -105,10 +149,12 @@ class Controlador {
     }
 
     /* Tratamientos */
+
     public function tratamientos() {
         $medicoId = $_SESSION['correo'];
         $gestor = new GestorCita();
         $pacientes = $gestor->consultarPacientesPorMedico($medicoId);
+        $tratamientos = $gestor->consultarTodosTratamientos();
         require 'Vista/html/medico/tratamientos.php';
     }
 
@@ -117,6 +163,19 @@ class Controlador {
         $gestor = new GestorCita();
         $pacientes = $gestor->consultarPacientesPorMedico($medicoId);
         require 'Vista/html/medico/asignarTratamientos.php';
+    }
+
+    public function mostrarEditarTratamiento($numero) {
+        $gestor = new GestorCita();
+        $tratamiento = $gestor->consultarTratamientoPorNumero($numero);
+        require 'Vista/html/medico/editarTratamientos.php';
+    }
+
+    public function procesarEditarTratamiento($numero, $descripcion, $fechaInicio, $fechaFin, $observaciones) {
+        $gestor = new GestorCita();
+        $gestor->editarTratamiento($numero, $descripcion, $fechaInicio, $fechaFin, $observaciones);
+        header("Location: index.php?accion=tratamientos");
+        exit;
     }
 
     /* Vista Paciente */

@@ -63,6 +63,20 @@
          $controlador->verTratamientosPac();
       }
 
+      elseif($_GET["accion"] == "editarTratamiento"){
+         $controlador->mostrarEditarTratamiento($_GET["numero"]);
+      }
+
+      elseif($_GET["accion"] == "procesarEditarTratamiento"){
+      $controlador->procesarEditarTratamiento(
+         $_POST["TraNumero"],
+         $_POST["TraDescripcion"],
+         $_POST["TraFechaInicio"],
+         $_POST["TraFechaFin"],
+         $_POST["TraObservaciones"]
+      );
+   }
+
       elseif($_GET["accion"] == "cancelarCita"){
          $controlador->cancelarCitas($_GET["cancelarDocumento"]);
       }
@@ -194,6 +208,7 @@
       elseif($_GET["accion"] == "registerPaciente"){
          $controlador->verPagina('Vista/html/registerPaciente.php');
       }
+
       elseif($_GET["accion"] == "procesarRegistroPaciente"){
          $controlador->procesarRegistroPaciente(
             $_POST["identificacion"],
@@ -204,6 +219,12 @@
             $_POST["correo"],
             $_POST["password"]
          );
+      }
+
+      elseif($_GET["accion"] == "logout"){
+         session_destroy();
+         header("Location: index.php?accion=login");
+         exit;
       }
    } 
       else {

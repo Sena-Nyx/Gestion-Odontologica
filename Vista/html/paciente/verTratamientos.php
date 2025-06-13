@@ -22,7 +22,13 @@ $rol = $_SESSION['rol'];
          <h1>Sistema de Gestión Odontológica</h1>
       </div>
       <ul id="menu"></ul>
-      <div id="contenido">
+      <div id="contenido" style="position: relative;">
+         <?php if (isset($_SESSION['nombre'])): ?>
+            <div style="position: absolute; top: 5px; right: 10px; font-weight: bold; color: #0075ff;">
+               <?php echo htmlspecialchars($_SESSION['nombre']); ?>
+               <a href="index.php?accion=logout" style="font-weight:normal; color:#ff3333; font-size:0.95em;">Cerrar sesion</a>
+            </div>
+         <?php endif; ?>
          <h2>Mis Tratamientos</h2>
          <table border="1" cellpadding="3">
             <tr>

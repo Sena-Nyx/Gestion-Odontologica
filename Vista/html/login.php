@@ -31,7 +31,7 @@
             ?>
             <div class="form-box">
                <form class="register-form" method="POST" action="index.php?accion=procesarLogin">
-                  <input type="text" name="correo" placeholder="correo" required />
+                  <input type="text" name="correo" id="correo" placeholder="correo" required />
                   <input type="password" name="password" placeholder="contraseña" required />
                   <select name="rol" id="rol" required>
                      <option value="">--- Seleccione un rol ---</option>

@@ -335,6 +335,18 @@ class GestorCita {
     }
 
     /* Tratamientos */
+
+    public function consultarTodosTratamientos() {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT t.*, p.PacNombres, p.PacApellidos 
+                FROM tratamientos t
+                INNER JOIN pacientes p ON t.TraPaciente = p.PacIdentificacion";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result;
+    }
     public function agregarTratamiento($fechaAsignado, $descripcion, $fechaInicio, $fechaFin, $observaciones, $paciente) {
         $conexion = new Conexion();
         $conexion->abrir();
@@ -364,5 +376,28 @@ class GestorCita {
         $result = $conexion->obtenerResult();
         $conexion->cerrar();
         return $result;
+    }
+
+    public function consultarTratamientoPorNumero($numero) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT * FROM tratamientos WHERE TraNumero = '$numero'";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result->fetch_object();
+    }
+
+    public function editarTratamiento($numero, $descripcion, $fechaInicio, $fechaFin, $observaciones) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "UPDATE tratamientos SET 
+                    TraDescripcion = '$descripcion',
+                    TraFechaInicio = '$fechaInicio',
+                    TraFechaFin = '$fechaFin',
+                    TraObservaciones = '$observaciones'
+                WHERE TraNumero = '$numero'";
+        $conexion->consulta($sql);
+        $conexion->cerrar();
     }
 }
