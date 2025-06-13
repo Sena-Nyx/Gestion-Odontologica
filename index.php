@@ -55,6 +55,26 @@
          $controlador->mostrarAsignarTratamiento();
       }
 
+      elseif($_GET["accion"] == "verCitasPac"){
+         $controlador->verCitasPac();
+      }
+      
+      elseif($_GET["accion"] == "verTratamientos"){
+         $controlador->verTratamientosPac();
+      }
+
+      elseif($_GET["accion"] == "cancelarCita"){
+         $controlador->cancelarCitas($_GET["cancelarDocumento"]);
+      }
+
+      elseif($_GET["accion"] == "ConsultarPaciente"){
+         $controlador->consultarPaciente($_GET["documento"]);
+      }
+      
+      elseif($_GET["accion"] == "agregarCitasPac"){
+         $controlador->agregarCitasPac();
+      }
+
       elseif($_GET["accion"] == "guardarTratamiento"){
          $controlador->guardarTratamiento(
             $_POST["TraDescripcion"],
@@ -80,23 +100,7 @@
          } else {
             echo "Debe ingresar el documento del paciente.";
          }
-      }
-
-      elseif($_GET["accion"] == "verCitasPac"){
-         $controlador->verCitasPac();
-      }
-      
-      elseif($_GET["accion"] == "verTratamientos"){
-         $controlador->verTratamientosPac();
-      }
-
-      elseif($_GET["accion"] == "cancelarCita"){
-         $controlador->cancelarCitas($_GET["cancelarDocumento"]);
-      }
-
-      elseif($_GET["accion"] == "ConsultarPaciente"){
-         $controlador->consultarPaciente($_GET["documento"]);
-      }      
+      }    
 
       elseif($_GET["accion"] == "ingresarPaciente"){
          $controlador->agregarPaciente(
@@ -106,6 +110,16 @@
             $_GET["PacNacimiento"],
             $_GET["PacSexo"],
             $_GET["pacCorreo"]
+         );
+      }
+
+      elseif($_GET["accion"] == "ingresarMedicos"){
+         $controlador->agregarMedico(
+            $_GET["MedIdentificacion"],
+            $_GET["MedNombres"],
+            $_GET["MedApellidos"],
+            $_GET["medCorreo"],
+            $_GET["medPassword"]
          );
       }
 
@@ -124,16 +138,6 @@
          );
       }
 
-      elseif($_GET["accion"] == "ingresarMedicos"){
-         $controlador->agregarMedico(
-            $_GET["MedIdentificacion"],
-            $_GET["MedNombres"],
-            $_GET["MedApellidos"],
-            $_GET["medCorreo"],
-            $_GET["medPassword"]
-         );
-      }
-
       elseif($_GET["accion"] == "editarMedico"){
          $controlador->mostrarEditarMedico($_GET["identificacion"]);
       }
@@ -145,6 +149,18 @@
          $_POST["apellido"],
          $_POST["correo"]
          );
+      }
+
+      elseif($_GET["accion"]=="estadoPaciente"){
+         $controlador->cambiarEstadoPaciente(
+            $_GET["identificacion"], 
+            $_GET["estado"]);
+      }
+
+      elseif($_GET["accion"]=="estadoMedico"){
+         $controlador->cambiarEstadoMedico(
+            $_GET["identificacion"], 
+            $_GET["estado"]);
       }
 
       elseif($_GET["accion"] == "eliminarMedico"){

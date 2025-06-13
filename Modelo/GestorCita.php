@@ -39,14 +39,32 @@ class GestorCita {
     public function consultarCitasPorDocumento($doc){
         $conexion = new Conexion();
         $conexion->abrir();
-        $sql = "SELECT * FROM citas "
-                . "WHERE CitPaciente = '$doc' "
-                . " AND CitEstado = 'Solicitada' ";
+        $sql = "SELECT citas.*, medicos.MedIdentificacion, medicos.MedNombres, medicos.MedApellidos, consultorios.ConNumero, consultorios.ConNombre
+                FROM citas
+                INNER JOIN medicos ON citas.CitMedico = medicos.MedIdentificacion
+                INNER JOIN consultorios ON citas.CitConsultorio = consultorios.ConNumero
+                WHERE citas.CitPaciente = '$doc' AND citas.CitEstado = 'Solicitada'";
         $conexion->consulta($sql);
         $result = $conexion->obtenerResult();
         $conexion->cerrar();
 
-        return $result ;
+        return $result;
+    }
+
+    public function consultarCitasPorDocumentoPaginado($doc, $inicio, $cantidad){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "SELECT citas.*, medicos.MedIdentificacion, medicos.MedNombres, medicos.MedApellidos, consultorios.ConNumero, consultorios.ConNombre
+                FROM citas
+                INNER JOIN medicos ON citas.CitMedico = medicos.MedIdentificacion
+                INNER JOIN consultorios ON citas.CitConsultorio = consultorios.ConNumero
+                WHERE citas.CitPaciente = '$doc' AND citas.CitEstado = 'Solicitada'
+                ORDER BY citas.CitFecha DESC
+                LIMIT $inicio, $cantidad";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result;
     }
 
     public function consultarHorasDisponibles($medico,$fecha){
@@ -127,7 +145,7 @@ class GestorCita {
         return $result;
     }
 
-    /* Pacientes  */
+    /* Pacientes */
     public function consultarPacientes(){
         $conexion = new Conexion();
         $conexion->abrir();
@@ -198,6 +216,17 @@ class GestorCita {
         $conexion->cerrar();
 
         return $filasAfectadas;
+    }
+
+    public function cambiarEstadoPaciente($documento, $estado){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "UPDATE pacientes SET PacEstado = '$estado' WHERE PacIdentificacion = '$documento'";
+        $conexion->consulta($sql);
+        // $filasAfectadas = $conexion->obtenerFilasAfectadas();
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result;
     }
     
     /* Medicos */
@@ -289,6 +318,16 @@ class GestorCita {
         $sql = "SELECT c.* FROM citas c
                 INNER JOIN medicos m ON c.CitMedico = m.MedIdentificacion
                 WHERE m.medCorreo = '$medicoCorreo'";
+        $conexion->consulta($sql);
+        $result = $conexion->obtenerResult();
+        $conexion->cerrar();
+        return $result;
+    }
+
+    public function cambiarEstadoMedico($identificacion, $estado){
+        $conexion = new Conexion();
+        $conexion->abrir();
+        $sql = "UPDATE medicos SET MedEstado = '$estado' WHERE MedIdentificacion = '$identificacion'";
         $conexion->consulta($sql);
         $result = $conexion->obtenerResult();
         $conexion->cerrar();

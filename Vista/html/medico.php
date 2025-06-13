@@ -40,6 +40,7 @@ $rol = $_SESSION['rol'];
                   <th>Nombres</th>
                   <th>Apellidos</th>
                   <th>Correo</th>
+                  <th>Estado</th>
                   <th>Editar</th>
                   <th>Eliminar</th>
                </tr>
@@ -49,6 +50,7 @@ $rol = $_SESSION['rol'];
                   <td><?php echo $medico->MedNombres; ?></td>
                   <td><?php echo $medico->MedApellidos; ?></td>
                   <td><?php echo $medico->medCorreo; ?></td>
+                  <td><a href="index.php?accion=estadoMedico&identificacion=<?php echo $medico->MedIdentificacion; ?>&estado=<?php echo $medico->MedEstado;?> "><?php echo $medico->MedEstado;?></a></td>
                   <td><a href='index.php?accion=editarMedico&identificacion=<?php echo $medico->MedIdentificacion; ?>'>Editar</a></td>
                   <td><a href="#" onclick="confirmarCancelarMedico('<?php echo $medico->MedIdentificacion; ?>')">Eliminar</a></td>
                </tr>

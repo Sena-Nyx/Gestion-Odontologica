@@ -24,7 +24,7 @@ $rol = $_SESSION['rol'];
       <ul id="menu"></ul>
       <div id="contenido">
          <h2>Mis Tratamientos</h2>
-         <table border="1" cellpadding="5">
+         <table border="1" cellpadding="3">
             <tr>
                <th>Número</th>
                <th>Fecha Asignado</th>

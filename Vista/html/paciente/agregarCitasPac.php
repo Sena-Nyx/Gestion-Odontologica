@@ -1,5 +1,5 @@
 <?php
-if (!isset($_SESSION['correo']) || $_SESSION['rol'] != 1) {
+if (!isset($_SESSION['correo']) || $_SESSION['rol'] != 2) {
    header("Location: index.php?accion=login");
    exit;
 }
@@ -37,11 +37,6 @@ $rol = $_SESSION['rol'];
                      <td>Documento del paciente</td>
                      <td><input type="text" name="asignarDocumento" id="asignarDocumento"></td>
                   </tr>
-
-                  <tr>
-                     <td colspan="2"><input type="button" name="consultarConsultar" value="Consultar" id="consultarConsultar" onclick="consultarPaciente()"></td>  
-                  </tr>
-
                   <tr>
                      <td colspan="2"><div id="paciente"></div></td>
                   </tr>
@@ -111,6 +106,43 @@ $rol = $_SESSION['rol'];
             </form>
 
          </div>
+      </div>
+
+      <div id="frmPaciente" title="Agregar Nuevo Paciente">
+         <form id="agregarPaciente">
+            <table>
+               <tr>
+                  <td>Identificacion</td>
+                  <td><input type="text" name="PacIdentificacion" id="PacIdentificacion"></td>
+               </tr>
+               <tr>
+                  <td>Nombres</td>
+                  <td><input type="text" name="PacNombres" id="PacNombres"></td>
+               </tr>
+               <tr>
+                  <td>Apellidos</td>
+                  <td><input type="text" name="PacApellidos" id="PacApellidos"></td>
+               </tr>
+               <tr>
+                  <td>Fecha de Nacimiento</td>
+                  <td><input type="date" name="PacNacimiento" id="PacNacimiento"></td>
+               </tr>
+               <tr>
+                  <td>Sexo</td>
+                  <td>
+                     <select id="PacSexo" name="PacSexo">
+                        <option value="-1" selected="selected">--Selecione el sexo ---</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                     </select>
+                  </td>
+               </tr>
+               <tr>
+                  <td>Correo</td>
+                  <td><input type="text" name="pacCorreo" id="pacCorreo"></td>
+               </tr>
+            </table>
+         </form>
       </div>
    </body>
 </html>

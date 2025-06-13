@@ -9,6 +9,7 @@ class Controlador {
         $gestorCita     = new GestorCita();
         $result         = $gestorCita->consultarCitaPorId($cita);
         require_once 'Vista/html/confirmarCita.php';
+        
     }
 
     public function confirmarCancelarCita($cita){
@@ -103,7 +104,135 @@ class Controlador {
         }
     }
 
-    /* Medicos */
+    /* Tratamientos */
+    public function tratamientos() {
+        $medicoId = $_SESSION['correo'];
+        $gestor = new GestorCita();
+        $pacientes = $gestor->consultarPacientesPorMedico($medicoId);
+        require 'Vista/html/medico/tratamientos.php';
+    }
+
+    public function mostrarAsignarTratamiento() {
+        $medicoId = $_SESSION['correo'];
+        $gestor = new GestorCita();
+        $pacientes = $gestor->consultarPacientesPorMedico($medicoId);
+        require 'Vista/html/medico/asignarTratamientos.php';
+    }
+
+    /* Vista Paciente */
+    public function verCitasPac() {
+        $correo = $_SESSION['correo'];
+        $gestor = new GestorCita();
+        $paciente = $gestor->consultarPacientePorCorreo($correo);
+
+        $inicio = isset($_GET['pos']) ? intval($_GET['pos']) : 0;
+        $cantidad = 1;
+
+        $result = $gestor->consultarCitasPorDocumentoPaginado($paciente->PacIdentificacion, $inicio, $cantidad);
+
+        // Es para saber si hay mas citas
+        $resultCantidad = $gestor->consultarCitasPorDocumento($paciente->PacIdentificacion);
+        $totalCitas = $resultCantidad->num_rows;
+
+        require 'Vista/html/paciente/verCitasPac.php';
+    }
+
+    public function verTratamientosPac() {
+        $correo = $_SESSION['correo'];
+        $gestor = new GestorCita();
+        $paciente = $gestor->consultarPacientePorCorreo($correo);
+        $result = $gestor->consultarTratamientosPorPaciente($paciente->PacIdentificacion);
+        require 'Vista/html/paciente/verTratamientos.php';
+    }
+
+    public function guardarTratamiento($descripcion, $fechaInicio, $fechaFin, $observaciones, $paciente) {
+        $gestor = new GestorCita();
+        $fechaAsignado = date('Y-m-d');
+        $resultado = $gestor->agregarTratamiento($fechaAsignado, $descripcion, $fechaInicio, $fechaFin, $observaciones, $paciente);
+        if ($resultado) {
+            header("Location: index.php?accion=tratamientos&registro=exito");
+        } else {
+            header("Location: index.php?accion=tratamientos&error=1");
+        }
+        exit;
+    }
+
+    /* Vista Admin (Pacientes) */
+    public function verPacientes() {
+        $gestor = new GestorCita();
+        $pacientes = $gestor->consultarPacientes();
+        require 'Vista/html/paciente.php';
+    }
+
+    public function mostrarEditarPaciente($identificacion) {
+        $gestor = new GestorCita();
+        $result = $gestor->consultarPacientePorId($identificacion);
+        $paciente = $result->fetch_object(); 
+        require 'Vista/html/editarPaciente.php';
+    }
+
+    public function editarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo) {
+        $gestor = new GestorCita();
+        $gestor->editarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo);
+        header("Location: index.php?accion=paciente");
+        exit;
+    }
+
+    public function consultarPaciente($doc){
+        $gestorCita = new GestorCita();
+        $result = $gestorCita->consultarPacientePorId($doc);
+        require_once 'Vista/html/consultarPaciente.php';
+    }
+
+    public function agregarPaciente($doc,$nom,$ape,$fec,$sex,$cor){
+        $paciente = new Paciente($doc, $nom, $ape, $fec, $sex, $cor);
+        $gestorCita = new GestorCita();
+        $registros = $gestorCita->agregarPaciente($paciente);
+        if($registros > 0){
+            echo "Se inserto el paciente con exito";
+        } 
+        else {
+            echo "Error al grabar el paciente";
+        }
+    }
+
+    public function confirmarEliminarPaciente($identificacion){
+        $gestorCita = new GestorCita();
+        $registros = $gestorCita->eliminarPaciente($identificacion);
+        if($registros > 0){
+            echo "El paciente se ha eliminado con éxito";
+        } else {
+            echo "Hubo un error al eliminar el paciente";
+        }
+    }
+    
+
+    public function procesarRegistroPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo, $password) {
+        $gestor = new GestorCita();
+        $resultado = $gestor->registrarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo, $password);
+        if ($resultado) {
+            header("Location: index.php?accion=login&registro=exito");
+        } else {
+            header("Location: index.php?accion=registerPaciente&error=1");
+        }
+        exit;
+    }
+
+    public function cambiarEstadoPaciente($identificacion, $estado){
+        $gestorCita = new GestorCita();
+        
+        if($estado == "Activo"){
+            $estado = "Inactivo";
+        } 
+        elseif($estado == "Inactivo") {
+            $estado = "Activo";
+        }
+
+        $registros = $gestorCita->cambiarEstadoPaciente($identificacion, $estado);
+        header("Location: index.php?accion=paciente");
+    }
+
+    /* Vista Admin (Medicos) */
     public function verMedicos() {
         $gestor = new GestorCita();
         $medicos = $gestor->consultarMedicos();
@@ -184,108 +313,26 @@ class Controlador {
         require 'Vista/html/medico/verCitasMed.php';
     }
 
-    /* Tratamientos */
-    public function tratamientos() {
-        $medicoId = $_SESSION['correo'];
-        $gestor = new GestorCita();
-        $pacientes = $gestor->consultarPacientesPorMedico($medicoId);
-        require 'Vista/html/medico/tratamientos.php';
-    }
+    public function cambiarEstadoMedico($identificacion, $estado){
+        $gestorCita= new GestorCita();
 
-    public function mostrarAsignarTratamiento() {
-        $medicoId = $_SESSION['correo'];
-        $gestor = new GestorCita();
-        $pacientes = $gestor->consultarPacientesPorMedico($medicoId);
-        require 'Vista/html/medico/asignarTratamientos.php';
-    }
-
-    /* Vista Paciente */
-    public function verCitasPac() {
-        $correo = $_SESSION['correo'];
-        $gestor = new GestorCita();
-        $paciente = $gestor->consultarPacientePorCorreo($correo);
-        $result = $gestor->consultarCitasPorDocumento($paciente->PacIdentificacion);
-        require 'Vista/html/paciente/verCitasPac.php';
-    }
-
-    public function verTratamientosPac() {
-        $correo = $_SESSION['correo'];
-        $gestor = new GestorCita();
-        $paciente = $gestor->consultarPacientePorCorreo($correo);
-        $result = $gestor->consultarTratamientosPorPaciente($paciente->PacIdentificacion);
-        require 'Vista/html/paciente/verTratamientos.php';
-    }
-
-    public function guardarTratamiento($descripcion, $fechaInicio, $fechaFin, $observaciones, $paciente) {
-        $gestor = new GestorCita();
-        $fechaAsignado = date('Y-m-d');
-        $resultado = $gestor->agregarTratamiento($fechaAsignado, $descripcion, $fechaInicio, $fechaFin, $observaciones, $paciente);
-        if ($resultado) {
-            header("Location: index.php?accion=tratamientos&registro=exito");
-        } else {
-            header("Location: index.php?accion=tratamientos&error=1");
+        if($estado == "Activo"){
+            $estado = "Inactivo";
+        } 
+        elseif($estado == "Inactivo") {
+            $estado = "Activo";
         }
-        exit;
+
+        $registro = $gestorCita->cambiarEstadoMedico($identificacion, $estado);
+        header("Location: index.php?accion=medicos");
     }
 
     /* Pacientes */
-    public function verPacientes() {
-        $gestor = new GestorCita();
-        $pacientes = $gestor->consultarPacientes();
-        require 'Vista/html/paciente.php';
-    }
-
-    public function mostrarEditarPaciente($identificacion) {
-        $gestor = new GestorCita();
-        $result = $gestor->consultarPacientePorId($identificacion);
-        $paciente = $result->fetch_object(); 
-        require 'Vista/html/editarPaciente.php';
-    }
-
-    public function editarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo) {
-        $gestor = new GestorCita();
-        $gestor->editarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo);
-        header("Location: index.php?accion=paciente");
-        exit;
-    }
-
-    public function consultarPaciente($doc){
+    public function agregarCitasPac() {
         $gestorCita = new GestorCita();
-        $result = $gestorCita->consultarPacientePorId($doc);
-        require_once 'Vista/html/consultarPaciente.php';
-    }
-
-    public function agregarPaciente($doc,$nom,$ape,$fec,$sex,$cor){
-        $paciente = new Paciente($doc, $nom, $ape, $fec, $sex, $cor);
-        $gestorCita = new GestorCita();
-        $registros = $gestorCita->agregarPaciente($paciente);
-        if($registros > 0){
-            echo "Se inserto el paciente con exito";
-        } 
-        else {
-            echo "Error al grabar el paciente";
-        }
-    }
-
-    public function confirmarEliminarPaciente($identificacion){
-        $gestorCita = new GestorCita();
-        $registros = $gestorCita->eliminarPaciente($identificacion);
-        if($registros > 0){
-            echo "El paciente se ha eliminado con éxito";
-        } else {
-            echo "Hubo un error al eliminar el paciente";
-        }
+        $medicos = $gestorCita->consultarMedicos();
+        $consultorios = $gestorCita->consultarConsultorios();
+        require 'Vista/html/paciente/agregarCitasPac.php';
     }
     
-
-    public function procesarRegistroPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo, $password) {
-        $gestor = new GestorCita();
-        $resultado = $gestor->registrarPaciente($identificacion, $nombres, $apellidos, $fechaNacimiento, $sexo, $correo, $password);
-        if ($resultado) {
-            header("Location: index.php?accion=login&registro=exito");
-        } else {
-            header("Location: index.php?accion=registerPaciente&error=1");
-        }
-        exit;
-    }
 }
